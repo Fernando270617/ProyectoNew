@@ -1,1 +1,220 @@
-# ProyectoNew
+#include <stdio.h>      // Incluye funciones estándar de entrada y salida
+#include <string.h>     // Incluye funciones para manipular cadenas
+#include <stdlib.h>     // Incluye funciones de utilidad general
+#include "mostrarMenu.h"
+#include "leerLinea.h"
+#include "leerEntero.h"
+//#include <ctype.h>      // Incluye funciones para clasificar caracteres
+
+// Definición de constantes
+#define MAX_PRODUCTOS 3          // Número máximo de productos
+#define MAX_MATERIALES 10        // Número máximo de materiales por producto
+#define LONGITUD_NOMBRE 50       // Longitud máxima para nombres
+
+// Definición de la estructura Material
+typedef struct {
+    char nombre[LONGITUD_NOMBRE];   // Nombre del material
+    int cantidad;                   // Cantidad del material
+} Material;
+
+// Definición de la estructura Producto
+typedef struct {
+    char nombre[LONGITUD_NOMBRE];           // Nombre del producto
+    int cantidad;                           // Cantidad requerida del producto
+    int tiempo;                             // Tiempo por unidad en minutos
+    Material materiales[MAX_MATERIALES];    // Arreglo de materiales necesarios
+    int numMateriales;                      // Número de materiales utilizados
+} Producto;
+
+// Arreglo global para almacenar los productos
+Producto productos[MAX_PRODUCTOS];
+int totalProductos = 0;   // Contador de productos almacenados
+
+// Función para agregar un nuevo producto
+void agregarProducto() {
+    if (totalProductos >= MAX_PRODUCTOS) {                         // Validar si hay espacio
+        printf("¡Capacidad máxima alcanzada!\n");
+        return;
+    }
+
+    Producto nuevoProducto;                                        // Crear nuevo producto
+
+    printf("Ingrese el nombre del producto: ");
+    leerLinea(nuevoProducto.nombre, LONGITUD_NOMBRE);             // Leer nombre del producto
+
+    printf("Ingrese la cantidad requerida: ");
+    nuevoProducto.cantidad = leerEntero();                        // Leer cantidad
+
+    printf("Ingrese el tiempo por unidad (minutos): ");
+    nuevoProducto.tiempo = leerEntero();                          // Leer tiempo por unidad
+
+    printf("Ingrese el número de materiales para este producto: ");
+    nuevoProducto.numMateriales = leerEntero();                   // Leer número de materiales
+
+    if (nuevoProducto.numMateriales > MAX_MATERIALES) {           // Validar límite
+        printf("Número de materiales excede el máximo permitido. Se limitará a %d.\n", MAX_MATERIALES);
+        nuevoProducto.numMateriales = MAX_MATERIALES;             // Ajustar a máximo permitido
+    }
+
+    for (int i = 0; i < nuevoProducto.numMateriales; i++) {       // Iterar por materiales
+        printf("Ingrese el nombre del material %d: ", i + 1);
+        leerLinea(nuevoProducto.materiales[i].nombre, LONGITUD_NOMBRE); // Leer nombre
+        printf("Ingrese la cantidad del material %s: ", nuevoProducto.materiales[i].nombre);
+        nuevoProducto.materiales[i].cantidad = leerEntero();      // Leer cantidad
+    }
+
+    productos[totalProductos] = nuevoProducto;                    // Guardar producto en el arreglo
+    totalProductos++;                                             // Aumentar contador de productos
+    printf("Producto agregado con éxito.\n");
+}
+
+// Función para buscar un producto por su nombre
+void buscarProducto() {
+    char nombre[LONGITUD_NOMBRE];
+    printf("Ingrese el nombre del producto a buscar: ");
+    leerLinea(nombre, LONGITUD_NOMBRE);                           // Leer nombre a buscar
+
+    for (int i = 0; i < totalProductos; i++) {
+        if (strcmp(productos[i].nombre, nombre) == 0) {           // Comparar con cada producto
+            printf("Producto encontrado:\n");
+            printf("Nombre: %s\n", productos[i].nombre);
+            printf("Cantidad: %d\n", productos[i].cantidad);
+            printf("Tiempo por unidad: %d minutos\n", productos[i].tiempo);
+            printf("Materiales:\n");
+            for (int j = 0; j < productos[i].numMateriales; j++) {
+                printf("  - %s: %d\n", productos[i].materiales[j].nombre, productos[i].materiales[j].cantidad);
+            }
+            return;
+        }
+    }
+
+    printf("Producto no encontrado en la base de datos.\n");
+}
+
+// Función para editar un producto existente
+void editarProducto() {
+    char nombre[LONGITUD_NOMBRE];
+    printf("Ingrese el nombre del producto a editar: ");
+    leerLinea(nombre, LONGITUD_NOMBRE);                          // Leer nombre del producto a editar
+
+    for (int i = 0; i < totalProductos; i++) {
+        if (strcmp(productos[i].nombre, nombre) == 0) {          // Buscar coincidencia
+            printf("Producto encontrado. Ingrese nuevos datos:\n");
+
+            printf("Nuevo nombre: ");
+            leerLinea(productos[i].nombre, LONGITUD_NOMBRE);     // Leer nuevo nombre
+
+            printf("Nueva cantidad: ");
+            productos[i].cantidad = leerEntero();                // Leer nueva cantidad
+
+            printf("Nuevo tiempo por unidad: ");
+            productos[i].tiempo = leerEntero();                  // Leer nuevo tiempo
+
+            printf("Nuevo número de materiales: ");
+            productos[i].numMateriales = leerEntero();           // Leer nuevo número de materiales
+
+            if (productos[i].numMateriales > MAX_MATERIALES) {
+                printf("Número de materiales excede el máximo permitido. Se limitará a %d.\n", MAX_MATERIALES);
+                productos[i].numMateriales = MAX_MATERIALES;
+            }
+
+            for (int j = 0; j < productos[i].numMateriales; j++) {
+                printf("Ingrese el nombre del material %d: ", j + 1);
+                leerLinea(productos[i].materiales[j].nombre, LONGITUD_NOMBRE);
+                printf("Ingrese la cantidad del material %s: ", productos[i].materiales[j].nombre);
+                productos[i].materiales[j].cantidad = leerEntero();
+            }
+
+            printf("Producto actualizado con éxito.\n");
+            return;
+        }
+    }
+
+    printf("Producto no encontrado dentro de la base de datos.\n");
+}
+
+// Función para eliminar un producto por nombre
+void eliminarProducto() {
+    char nombre[LONGITUD_NOMBRE];
+    printf("Ingrese el nombre del producto a eliminar: ");
+    leerLinea(nombre, LONGITUD_NOMBRE);
+
+    for (int i = 0; i < totalProductos; i++) {
+        if (strcmp(productos[i].nombre, nombre) == 0) {
+            for (int j = i; j < totalProductos - 1; j++) {
+                productos[j] = productos[j + 1];    // Mover los productos hacia atrás
+            }
+            totalProductos--;                       // Reducir el conteo total
+            printf("Producto eliminado.\n");
+            return;
+        }
+    }
+
+    printf("Producto no encontrado.\n");
+}
+
+// Función para calcular el tiempo total necesario para todos los productos
+int calcularTiempoTotal() {
+    int total = 0;
+    for (int i = 0; i < totalProductos; i++) {
+        total += productos[i].cantidad * productos[i].tiempo; // Sumar tiempo total por producto
+    }
+    return total;
+}
+
+// Función para calcular recursos totales requeridos
+int calcularRecursosTotales() {
+    int total = 0;
+    for (int i = 0; i < totalProductos; i++) {
+        for (int j = 0; j < productos[i].numMateriales; j++) {
+            total += productos[i].cantidad * productos[i].materiales[j].cantidad;
+        }
+    }
+    return total;
+}
+
+// Función para verificar si se puede cumplir con la demanda en el tiempo especificado
+void verificarFactibilidad(int tiempoMaximo) {
+    int tiempoTotal = calcularTiempoTotal();         // Calcular tiempo total
+    int recursosTotales = calcularRecursosTotales(); // Calcular recursos totales
+
+    printf("Tiempo total requerido: %d minutos\n", tiempoTotal);
+    printf("Recursos totales requeridos: %d unidades\n", recursosTotales);
+
+    if (tiempoTotal <= tiempoMaximo) {
+        printf("Se puede cumplir con la demanda en el tiempo especificado.\n");
+    } else {
+        printf("No se puede cumplir con la demanda en el tiempo especificado.\n");
+    }
+}
+
+// Main
+int main() {
+    int opcion;
+    int tiempoMaximo;
+
+    printf("Bienvenido a la Fábrica de Electrodomésticos Chikisaurio\n");
+    printf("Ingrese el tiempo máximo disponible para generar los productos (minutos): ");
+    tiempoMaximo = leerEntero();
+
+    do {
+        mostrarMenu();
+        opcion = leerEntero();
+
+        switch (opcion) {
+            case 1: agregarProducto(); break;
+            case 2: editarProducto(); break;
+            case 3: buscarProducto(); break;
+            case 4: eliminarProducto(); break;
+            case 5:
+                printf("Tiempo total requerido: %d minutos\n", calcularTiempoTotal());
+                printf("Recursos totales requeridos: %d unidades\n", calcularRecursosTotales());
+                break;
+            case 6: verificarFactibilidad(tiempoMaximo); break;
+            case 7: printf("Saliendo del programa.\n"); break;
+            default: printf("Opción inválida. Inténtelo de nuevo.\n"); break;
+        }
+    } while (opcion != 7);
+
+    return 0;
+}
