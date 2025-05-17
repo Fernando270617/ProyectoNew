@@ -1,0 +1,16 @@
+#include <stdio.h>
+
+// Función para leer un entero de forma segura
+
+int leerEntero() {
+    char buffer[20];                                 // Buffer para almacenar entrada como texto
+    int valor;                                       // Variable para almacenar el entero
+    while (1) {
+        leerLinea(buffer, sizeof(buffer));           // Leer línea del usuario
+        if (sscanf(buffer, "%d", &valor) == 1) {    // Intentar convertir a entero
+            return valor;                            // Si es válido, devolver el valor
+        } else {
+            printf("Entrada inválida. Ingrese un número: ");  // Si no es válido, pedir de nuevo
+        }
+    }
+}
