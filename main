@@ -206,15 +206,11 @@ int main() {
             case 2: editarProducto(); break;
             case 3: buscarProducto(); break;
             case 4: eliminarProducto(); break;
-            case 5:
-                printf("Tiempo total requerido: %d minutos\n", calcularTiempoTotal());
-                printf("Recursos totales requeridos: %d unidades\n", calcularRecursosTotales());
-                break;
-            case 6: verificarFactibilidad(tiempoMaximo); break;
-            case 7: printf("Saliendo del programa.\n"); break;
+            case 5: verificarFactibilidad(tiempoMaximo); break;
+            case 6: printf("Saliendo del programa.\n"); break;
             default: printf("Opción inválida. Inténtelo de nuevo.\n"); break;
         }
-    } while (opcion != 7);
+    } while (opcion != 6);
 
     return 0;
 }
